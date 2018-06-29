@@ -2,6 +2,7 @@ package harby.graham.geminiled;
 
 import android.app.NotificationManager;
 import android.content.Context;
+import android.os.SystemClock;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 import android.util.Log;
@@ -43,19 +44,19 @@ public class GeminiNotificationListener extends NotificationListenerService {
                 while(active){
                     active = loadActiveLEDList();
                     lightLEDs();
-                    try {
-                        Thread.sleep(GeminiLED.ledOnTime);
-                    }
-                    catch (InterruptedException e) {
-                        System.out.println("blinkLED ledOnTime interrupt " + e);
-                    }
+//                    try {
+                        SystemClock.sleep(GeminiLED.ledOnTime);
+//                    }
+//                    catch (InterruptedException e) {
+//                        System.out.println("blinkLED ledOnTime interrupt " + e);
+//                    }
                     blankLEDs();
-                    try {
-                        Thread.sleep(GeminiLED.ledOffTime);
-                    }
-                    catch (InterruptedException e) {
-                        System.out.println("blinkLED ledOffTime interrupt " + e);
-                    }
+//                    try {
+                        SystemClock.sleep(GeminiLED.ledOffTime);
+//                    }
+//                    catch (InterruptedException e) {
+//                        System.out.println("blinkLED ledOffTime interrupt " + e);
+//                    }
                 }
             }
         });
@@ -78,10 +79,11 @@ public class GeminiNotificationListener extends NotificationListenerService {
         String text = "Notification from: " + pack + " title: " + title;
         Log.i(GeminiLED.TAG, text);
 
-        if(lightLED(pack) && !active){
-            active = true;
-            blinkLED.start();
-        }
+//        if(lightLED(pack) && !active){
+//            active = true;
+//            blinkLED.start();
+//        }
+        loadActiveLEDList();
     }
 
     @Override
@@ -93,9 +95,10 @@ public class GeminiNotificationListener extends NotificationListenerService {
 
         String text = "Notification removed: " + pack + " title: " + title;
         Log.i(GeminiLED.TAG, text);
-        if(!loadActiveLEDList() && blinkLED.isAlive()){
-            blinkLED.interrupt();
-        }
+        loadActiveLEDList();
+//        if(!loadActiveLEDList() && blinkLED.isAlive()){
+//            blinkLED.interrupt();
+//        }
     }
 
     @Override
@@ -103,9 +106,9 @@ public class GeminiNotificationListener extends NotificationListenerService {
         super.onDestroy();
 
         blankLEDs();
-        if(blinkLED.isAlive()){
-            blinkLED.interrupt();
-        }
+//        if(blinkLED.isAlive()){
+//            blinkLED.interrupt();
+//        }
     }
 
     boolean loadActiveLEDList(){
@@ -121,6 +124,7 @@ public class GeminiNotificationListener extends NotificationListenerService {
                 }
             }
         }
+        lightLEDs();
         return activeLEDs;
     }
 
@@ -135,15 +139,16 @@ public class GeminiNotificationListener extends NotificationListenerService {
     }
 
     void lightLEDs(){
+        blankLEDs();
         if(activeLEDList.size() > 0) {
             for (Integer i : activeLEDList) {
                 openLed(i, geminiLED.ledMap.get(i).getColour());
             }
         }
-        else{
-            active = false;
-            blankLEDs();
-        }
+//        else{
+//            active = false;
+//            blankLEDs();
+//        }
     }
 
     void blankLEDs(){
