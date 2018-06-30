@@ -1,7 +1,7 @@
 # GeminiLED
 Exclusively for the Planet Computer Gemini PDA to utilise the 5 notification LEDs
 
-Original version will flash centre LED for notifications colours as follows:
+Original version will light each of the 5 centre LED for notifications colours as follows:
 
 Viber - magenta
 WhatsApp - green
