@@ -1,12 +1,11 @@
 package harby.graham.geminiled;
 
 /**
- * Created by graham on 24/06/18.
+ * To do.
  */
 
 class Colour {
 
-    String name;
     int r, g, b;
 
     static final int Z = 0;
@@ -19,7 +18,7 @@ class Colour {
     static final int YELLOW = 6;
     static final int WHITE = 7;
 
-    public Colour(int i){
+    Colour(int i){
         switch (i) {
             case BLACK:
                 r = 0;

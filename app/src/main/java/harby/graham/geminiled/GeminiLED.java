@@ -1,20 +1,18 @@
 package harby.graham.geminiled;
 
 import android.util.Log;
-
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by graham on 27/06/18.
+ * To do.
  */
 
 class GeminiLED {
 
     static final String TAG = "GeminiLED";
     Map <Integer, NotificationProfile> ledMap;
-    static int ledOnTime = 2000;
-    static int ledOffTime = 500;
+    static final int KEY = 256;
 
     GeminiLED(){
         ledMap = new HashMap<>();
@@ -27,7 +25,7 @@ class GeminiLED {
     }
 
     Integer getKey(String s){
-        Integer key = 256;
+        Integer key = KEY;
             for(Integer i: ledMap.keySet()){
                 if(s.contains(ledMap.get(i).getPackName())) {
                     key = i;

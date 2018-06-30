@@ -9,9 +9,9 @@ public class MainActivity extends AppCompatActivity {
 
     TextView panel;
     String text = "Beta version of GeminiLED\n\n" +
-            "This version will flash centre LED for notifications colours as follows:\n" +
+            "This version will light the 5 centre LEDs for notifications, colours as follows:\n" +
             "Viber - magenta\n" + "WhatsApp - green\n" + "K9 Mail - red\n" +
-            "Handcent Next SMS - blue\n" + "Dialer (call and missed call) - cyan\n\n" +
+            "Messaging SMS - blue\n" + "Dialer (call and missed call) - cyan\n\n" +
             "NOTE: This app needs access to notifications to work.\n" +
             "Select Settings, Apps, Settings (gear wheel), Special access, Notification access " +
             "slider on for GeminiLED\n\n" + "User configuration to be developed";

@@ -2,7 +2,6 @@ package harby.graham.geminiled;
 
 import android.app.NotificationManager;
 import android.content.Context;
-import android.os.SystemClock;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 import android.util.Log;
@@ -22,9 +21,7 @@ public class GeminiNotificationListener extends NotificationListenerService {
     static GeminiLED geminiLED;
 
     Method method;
-    boolean active = false;
     Set<Integer> activeLEDList;
-    Thread blinkLED;
 
     @Override
     public void onCreate() {
@@ -36,38 +33,6 @@ public class GeminiNotificationListener extends NotificationListenerService {
         reflect(context);
         geminiLED = new GeminiLED();
         activeLEDList = new HashSet<>();
-
-        blinkLED = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Log.i(GeminiLED.TAG, "blinkLED started");
-                while(active){
-                    active = loadActiveLEDList();
-                    lightLEDs();
-//                    try {
-                        SystemClock.sleep(GeminiLED.ledOnTime);
-//                    }
-//                    catch (InterruptedException e) {
-//                        System.out.println("blinkLED ledOnTime interrupt " + e);
-//                    }
-                    blankLEDs();
-//                    try {
-                        SystemClock.sleep(GeminiLED.ledOffTime);
-//                    }
-//                    catch (InterruptedException e) {
-//                        System.out.println("blinkLED ledOffTime interrupt " + e);
-//                    }
-                }
-            }
-        });
-
-        active = loadActiveLEDList();
-        if(active){
-            blinkLED.start();
-        }
-        else{
-            Log.i(GeminiLED.TAG, "active LEDs not detected");
-        }
     }
 
     @Override
@@ -79,10 +44,6 @@ public class GeminiNotificationListener extends NotificationListenerService {
         String text = "Notification from: " + pack + " title: " + title;
         Log.i(GeminiLED.TAG, text);
 
-//        if(lightLED(pack) && !active){
-//            active = true;
-//            blinkLED.start();
-//        }
         loadActiveLEDList();
     }
 
@@ -96,9 +57,6 @@ public class GeminiNotificationListener extends NotificationListenerService {
         String text = "Notification removed: " + pack + " title: " + title;
         Log.i(GeminiLED.TAG, text);
         loadActiveLEDList();
-//        if(!loadActiveLEDList() && blinkLED.isAlive()){
-//            blinkLED.interrupt();
-//        }
     }
 
     @Override
@@ -106,49 +64,31 @@ public class GeminiNotificationListener extends NotificationListenerService {
         super.onDestroy();
 
         blankLEDs();
-//        if(blinkLED.isAlive()){
-//            blinkLED.interrupt();
-//        }
     }
 
-    boolean loadActiveLEDList(){
-        boolean activeLEDs = false;
+    void loadActiveLEDList(){
         activeLEDList.clear();
         StatusBarNotification[] sbns = getActiveNotifications();
         if(!(sbns==null)) {
             for (StatusBarNotification sbn : sbns) {
                 int i = geminiLED.getKey(sbn.getPackageName());
-                if (i < 255) {
+                if (i < GeminiLED.KEY) {
                     activeLEDList.add(i);
-                    activeLEDs = true;
                 }
             }
         }
         lightLEDs();
-        return activeLEDs;
-    }
-
-    boolean lightLED(String pack){
-        boolean lit = false;
-        int led = geminiLED.getKey(pack);
-        if(led < 255){
-            openLed(led, geminiLED.ledMap.get(led).getColour());
-            lit = true;
-        }
-        return lit;
     }
 
     void lightLEDs(){
-        blankLEDs();
-        if(activeLEDList.size() > 0) {
-            for (Integer i : activeLEDList) {
+        for(Integer i: geminiLED.ledMap.keySet()){
+            if(activeLEDList.contains(i)){
                 openLed(i, geminiLED.ledMap.get(i).getColour());
             }
+            else{
+                openLed(i, new Colour(Colour.BLACK));
+            }
         }
-//        else{
-//            active = false;
-//            blankLEDs();
-//        }
     }
 
     void blankLEDs(){
