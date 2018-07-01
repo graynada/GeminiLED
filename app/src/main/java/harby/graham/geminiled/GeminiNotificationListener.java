@@ -2,6 +2,7 @@ package harby.graham.geminiled;
 
 import android.app.NotificationManager;
 import android.content.Context;
+import android.os.Bundle;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 import android.util.Log;
@@ -39,11 +40,10 @@ public class GeminiNotificationListener extends NotificationListenerService {
     public void onNotificationPosted(StatusBarNotification sbn) {
 
         String pack = sbn.getPackageName();
-        String title = sbn.getNotification().extras.getString("android.title");
+        String titleAndText = getTitleAndText(sbn);
 
-        String text = "Notification from: " + pack + " title: " + title;
+        String text = "Notification from: " + pack + titleAndText;
         Log.i(GeminiLED.TAG, text);
-
         loadActiveLEDList();
     }
 
@@ -52,11 +52,23 @@ public class GeminiNotificationListener extends NotificationListenerService {
         super.onNotificationRemoved(sbn);
 
         String pack = sbn.getPackageName();
-        String title = sbn.getNotification().extras.getString("android.title");
+//        String title = sbn.getNotification().extras.getString("android.title");
+        String titleAndText = getTitleAndText(sbn);
 
-        String text = "Notification removed: " + pack + " title: " + title;
+        String text = "Notification removed: " + pack + titleAndText;
         Log.i(GeminiLED.TAG, text);
         loadActiveLEDList();
+    }
+
+    String getTitleAndText(StatusBarNotification sbn){
+        Bundle extras = sbn.getNotification().extras;
+        CharSequence title = "";
+        CharSequence text = "";
+        if (extras != null) {
+            title = extras.getCharSequence("android.title");
+            text = extras.getCharSequence("android.text");
+        }
+        return " Title: " + title + " Text: " + text;
     }
 
     @Override
