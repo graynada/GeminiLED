@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">GeminiLED</string>
+
+    <string name="title_activity_app_grid">AppGrid</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
 </resources>

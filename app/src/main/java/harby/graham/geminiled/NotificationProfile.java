@@ -11,24 +11,26 @@ class NotificationProfile implements Comparable<NotificationProfile>{
     private String packName;
     private Colour colour;
 
-    public NotificationProfile(String packName, Colour colour) {
+    NotificationProfile(String packName, Colour colour) {
         this.packName = packName;
         this.colour = colour;
     }
 
-    public String getPackName() {
+    NotificationProfile(String packName, int colour){
+        this.packName = packName;
+        this.colour = new Colour(colour);
+
+    }
+
+    String getPackName() {
         return packName;
     }
 
-    public void setPackName(String packName) {
-        this.packName = packName;
-    }
-
-    public Colour getColour() {
+    Colour getColour() {
         return colour;
     }
 
-    public void setColour(Colour colour) {
+    void setColour(Colour colour) {
         this.colour = colour;
     }
 

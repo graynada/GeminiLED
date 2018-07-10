@@ -16,6 +16,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <service
             android:name=".GeminiNotificationListener"
             android:enabled="true"
@@ -27,6 +28,11 @@
             </intent-filter>
         </service>
 
+        <activity
+            android:name=".AppGrid"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_app_grid"
+            android:theme="@style/FullscreenTheme"></activity>
     </application>
 
 </manifest>
