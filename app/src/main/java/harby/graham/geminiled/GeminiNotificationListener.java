@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 import android.util.Log;
@@ -28,6 +29,14 @@ public class GeminiNotificationListener extends NotificationListenerService {
     Method method;
     Set<Integer> activeLEDList;
 
+    final String PREF_FILE = "harby.graham.geminiled";
+    String defaultPackage = PREF_FILE;
+    int defaultColour = Colour.WHITE;
+    SharedPreferences savedLedMap;
+
+    String[] dataKeys = {"one", "two", "three", "four", "five"};
+    String[] dataTypes = {"package", "colour"};
+
     @Override
     public void onCreate() {
 
@@ -37,12 +46,14 @@ public class GeminiNotificationListener extends NotificationListenerService {
         Log.i(GeminiLED.TAG, "Gemini Notification Listener service started");
 
         geminiLED = new GeminiLED();
+        loadData();
         notificationReceiver = new NotificationReceiver();
         IntentFilter filter = new IntentFilter();
         filter.addAction(FILTER);
         registerReceiver(notificationReceiver, filter);
         reflect(context);
         activeLEDList = new HashSet<>();
+        loadActiveLEDList();
     }
 
     @Override
@@ -99,10 +110,6 @@ public class GeminiNotificationListener extends NotificationListenerService {
         StatusBarNotification[] sbns = getActiveNotifications();
         if(!(sbns==null)) {
             for (StatusBarNotification sbn : sbns) {
-//                int i = geminiLED.getKey(sbn.getPackageName());
-//                if (i < GeminiLED.KEY) {
-//                    activeLEDList.add(i);
-//                }
                 for(int i: geminiLED.ledMap.keySet()){
                     if(geminiLED.ledMap.get(i).getPackName().equals(sbn.getPackageName())){
                         activeLEDList.add(i);
@@ -159,10 +166,41 @@ public class GeminiNotificationListener extends NotificationListenerService {
             String command = intent.getStringExtra(MainActivity.COMMAND);
             switch (command){
                 case MainActivity.UPDATE:
+                    writeData();
                     loadActiveLEDList();
                     break;
             }
         }
     }
+
+    void loadData(){
+        savedLedMap = getApplicationContext().getSharedPreferences(PREF_FILE, MODE_PRIVATE);
+        for(int i = 0; i < dataKeys.length; ++i){
+            String packKey = dataKeys[i] + dataTypes[0];
+            String pack = defaultPackage;
+            String colourKey = dataKeys[i] + dataTypes[1];
+            int colour = defaultColour;
+            if (savedLedMap.contains(packKey)) {
+                pack = savedLedMap.getString(packKey, defaultPackage);
+            }
+            if (savedLedMap.contains(colourKey)) {
+                colour = savedLedMap.getInt(colourKey, defaultColour);
+            }
+            geminiLED.ledMap.put(i + 1, new NotificationProfile(pack, colour));
+        }
+    }
+
+    void writeData(){
+        SharedPreferences.Editor editor = savedLedMap.edit();
+        for(int i: geminiLED.ledMap.keySet()){
+            String packKey = dataKeys[i - 1] + dataTypes[0];
+            String colourKey = dataKeys[i - 1] + dataTypes[1];
+            editor.putString(packKey, geminiLED.ledMap.get(i).getPackName());
+            editor.putInt(colourKey, geminiLED.ledMap.get(i).getColour().getInt());
+        }
+        editor.apply();
+    }
+
+
 
 }

@@ -6,12 +6,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-//import android.provider.Settings;
 import android.provider.Settings;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -46,14 +44,6 @@ public class MainActivity extends AppCompatActivity {
             Color.MAGENTA, Color.YELLOW, Color.WHITE};
     static int updated = 255;
 
-    final String PREF_FILE = "harby.graham.geminiled";
-    String defaultPackage = PREF_FILE;
-    int defaultColour = Colour.WHITE;
-    SharedPreferences savedLedMap;
-
-    String[] dataKeys = {"one", "two", "three", "four", "five"};
-    String[] dataTypes = {"package", "colour"};
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,7 +71,6 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         if (notificationReceiver != null) {
             unregisterReceiver(notificationReceiver);
-            writeData();
         }
         finish();
     }
@@ -138,8 +127,6 @@ public class MainActivity extends AppCompatActivity {
         startService(new Intent(this, GeminiNotificationListener.class));
 
         geminiLED = GeminiNotificationListener.geminiLED;
-        loadData();
-
         installedApps = getInstalledApps(this);
         Collections.sort(installedApps, myComparator);
     }
@@ -306,34 +293,6 @@ public class MainActivity extends AppCompatActivity {
             }
             colourSelect.show();
         }
-    }
-
-    void loadData(){
-        savedLedMap = getApplicationContext().getSharedPreferences(PREF_FILE, MODE_PRIVATE);
-        for(int i = 0; i < dataKeys.length; ++i){
-            String packKey = dataKeys[i] + dataTypes[0];
-            String pack = defaultPackage;
-            String colourKey = dataKeys[i] + dataTypes[1];
-            int colour = defaultColour;
-            if (savedLedMap.contains(packKey)) {
-                pack = savedLedMap.getString(packKey, defaultPackage);
-            }
-            if (savedLedMap.contains(colourKey)) {
-                colour = savedLedMap.getInt(colourKey, defaultColour);
-            }
-            geminiLED.ledMap.put(i + 1, new NotificationProfile(pack, colour));
-        }
-    }
-
-    void writeData(){
-        SharedPreferences.Editor editor = savedLedMap.edit();
-            for(int i: geminiLED.ledMap.keySet()){
-                String packKey = dataKeys[i - 1] + dataTypes[0];
-                String colourKey = dataKeys[i - 1] + dataTypes[1];
-                editor.putString(packKey, geminiLED.ledMap.get(i).getPackName());
-                editor.putInt(colourKey, geminiLED.ledMap.get(i).getColour().getInt());
-            }
-            editor.apply();
     }
 
 }
