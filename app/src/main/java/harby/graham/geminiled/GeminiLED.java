@@ -11,6 +11,8 @@ class GeminiLED {
 
     static final String TAG = "GeminiLED";
     Map <Integer, NotificationProfile> ledMap;
+    boolean keyboardLEDon = false;
+    boolean coverLEDsOn = true;
     static final int KEY = 256;
 
     GeminiLED(){

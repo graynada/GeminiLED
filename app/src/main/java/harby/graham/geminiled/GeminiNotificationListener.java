@@ -29,13 +29,15 @@ public class GeminiNotificationListener extends NotificationListenerService {
     Method method;
     Set<Integer> activeLEDList;
 
-    final String PREF_FILE = "harby.graham.geminiled";
-    String defaultPackage = PREF_FILE;
+    static final String PREF_FILE = "harby.graham.geminiled";
+    static String defaultPackage = PREF_FILE;
     int defaultColour = Colour.WHITE;
     SharedPreferences savedLedMap;
 
     String[] dataKeys = {"one", "two", "three", "four", "five"};
     String[] dataTypes = {"package", "colour"};
+    String kbLEDenabled = "keyboardLEDon";
+    String coverLEDs = "coverLEDsOn";
 
     @Override
     public void onCreate() {
@@ -121,13 +123,23 @@ public class GeminiNotificationListener extends NotificationListenerService {
     }
 
     void lightLEDs(){
-        for(Integer i: geminiLED.ledMap.keySet()){
-            if(activeLEDList.contains(i)){
-                openLed(i, geminiLED.ledMap.get(i).getColour());
+        if(geminiLED.coverLEDsOn) {
+            for (Integer i : geminiLED.ledMap.keySet()) {
+                if (activeLEDList.contains(i)) {
+                    openLed(i, geminiLED.ledMap.get(i).getColour());
+                } else {
+                    openLed(i, new Colour(Colour.BLACK));
+                }
             }
-            else{
-                openLed(i, new Colour(Colour.BLACK));
-            }
+        }
+        else{
+            blankLEDs();
+        }
+        if(activeLEDList.size()>0 && geminiLED.keyboardLEDon){
+            openLed(7, new Colour(Colour.GREEN));
+        }
+        else {
+            openLed(7, new Colour(Colour.BLACK));
         }
     }
 
@@ -188,6 +200,12 @@ public class GeminiNotificationListener extends NotificationListenerService {
             }
             geminiLED.ledMap.put(i + 1, new NotificationProfile(pack, colour));
         }
+        if(savedLedMap.contains(kbLEDenabled)) {
+            geminiLED.keyboardLEDon = savedLedMap.getBoolean(kbLEDenabled, false);
+        }
+        if(savedLedMap.contains(coverLEDs)){
+            geminiLED.coverLEDsOn = savedLedMap.getBoolean(coverLEDs, true);
+        }
     }
 
     void writeData(){
@@ -198,6 +216,8 @@ public class GeminiNotificationListener extends NotificationListenerService {
             editor.putString(packKey, geminiLED.ledMap.get(i).getPackName());
             editor.putInt(colourKey, geminiLED.ledMap.get(i).getColour().getInt());
         }
+        editor.putBoolean(kbLEDenabled, geminiLED.keyboardLEDon);
+        editor.putBoolean(coverLEDs, geminiLED.coverLEDsOn);
         editor.apply();
     }
 

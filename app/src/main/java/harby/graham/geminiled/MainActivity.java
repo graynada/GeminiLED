@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -40,6 +41,8 @@ public class MainActivity extends AppCompatActivity {
     static TextView[] colours;
     private TextView[] packages;
     private ImageView[] icons;
+    private Switch keyboardLEDSwitch, coverLEDSwitch;
+    private ImageView settings;
     static int[] colors = {Color.BLACK, Color.BLUE, Color.GREEN, Color.CYAN, Color.RED,
             Color.MAGENTA, Color.YELLOW, Color.WHITE};
     static int updated = 255;
@@ -154,6 +157,10 @@ public class MainActivity extends AppCompatActivity {
         icons[2] = (ImageView) findViewById(R.id.icon_3);
         icons[3] = (ImageView) findViewById(R.id.icon_4);
         icons[4] = (ImageView) findViewById(R.id.icon_5);
+
+        coverLEDSwitch = (Switch) findViewById(R.id.coverledsw);
+        keyboardLEDSwitch = (Switch) findViewById(R.id.kbledsw);
+        settings = (ImageView) findViewById(R.id.settings);
     }
 
     void loadUI(){
@@ -167,12 +174,42 @@ public class MainActivity extends AppCompatActivity {
             try {
                 icons[j].setImageDrawable(getPackageManager().getApplicationIcon(geminiLED.ledMap.get(i).getPackName()));
                 icons[j].setOnClickListener(new IconClick(i));
+                icons[j].setOnLongClickListener(new IconLongClick(i));
                 packages[j].setText(getPackageManager().getApplicationLabel(getPackageManager().getApplicationInfo(geminiLED.ledMap.get(i).getPackName(), 0)));
             }
             catch (PackageManager.NameNotFoundException e){
+                geminiLED.ledMap.put(i, new NotificationProfile(GeminiNotificationListener.defaultPackage, Colour.WHITE));
+                icons[j].setImageResource(R.mipmap.ic_launcher);
+                icons[j].setOnClickListener(new IconClick(i));
+                packages[j].setText(getApplicationContext().getPackageName());
                 Log.e(GeminiLED.TAG, "Package name not found");
             }
         }
+
+        coverLEDSwitch.setChecked(geminiLED.coverLEDsOn);
+        coverLEDSwitch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                geminiLED.coverLEDsOn = coverLEDSwitch.isChecked();
+                sendCommand(UPDATE);
+            }
+        });
+
+        keyboardLEDSwitch.setChecked(geminiLED.keyboardLEDon);
+        keyboardLEDSwitch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                geminiLED.keyboardLEDon = keyboardLEDSwitch.isChecked();
+                sendCommand(UPDATE);
+            }
+        });
+        settings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Intent intent = new Intent(MainActivity.this, AdvancedSettings.class);
+                //startActivity(intent);
+            }
+        });
 
     }
 
@@ -253,6 +290,49 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(MainActivity.this, AppGrid.class);
             intent.putExtra(LED, led);
             startActivity(intent);
+        }
+    }
+
+    private class IconLongClick implements View.OnLongClickListener{
+
+        final int led;
+
+        IconLongClick(int i){
+            led = i;
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            //https://www.mkyong.com/android/android-alert-dialog-example/
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
+
+            // set title
+            alertDialogBuilder.setTitle("Clear LED?");
+
+            // set dialog message
+            alertDialogBuilder
+                    .setMessage("Do you wish to clear the app assignment to the LED?")
+                    .setCancelable(false)
+                    .setPositiveButton("Clear",new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog,int id) {
+                            geminiLED.ledMap.put(led, new NotificationProfile(GeminiNotificationListener.defaultPackage, Colour.WHITE));
+                            //finish();
+                        }
+                    })
+                    .setNegativeButton("Cancel",new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog,int id) {
+                            // if this button is clicked, just close
+                            // the dialog box and do nothing
+                            //finish();
+                        }
+                    });
+
+            // create alert dialog
+            AlertDialog alertDialog = alertDialogBuilder.create();
+
+            // show it
+            alertDialog.show();
+            return false;
         }
     }
 

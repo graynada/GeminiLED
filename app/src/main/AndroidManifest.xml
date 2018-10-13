@@ -32,7 +32,8 @@
             android:name=".AppGrid"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_app_grid"
-            android:theme="@style/FullscreenTheme"></activity>
+            android:theme="@style/FullscreenTheme" />
+        <activity android:name=".AdvancedSettings"></activity>
     </application>
 
 </manifest>
