@@ -5,5 +5,3 @@ User can select each of the 5 cover notification LEDs to light on receipt of an 
 
 NOTE: This app needs access to notifications to work.
 Select Settings, Apps, Settings (gear wheel), Special access, Notification access slider on for GeminiLED
-
-User configuration to be developed
